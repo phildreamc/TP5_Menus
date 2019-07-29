@@ -1,0 +1,13 @@
+<html>
+<head>
+<title>上传菜单</title>
+</head>
+<body>
+    <form action="{:url('up_load/upload')}" method="post" enctype="multipart/form-data">
+        <p>店铺名称：<input type="text" name="name" /></p>
+        <p>经营类型：早餐<input type="checkbox" name="type[]" value="1"> 炒菜<input type="checkbox" name="type[]" value="2"> 套餐/盖饭/面食<input type="checkbox" name="type[]" value="3"> 小吃/卤味/饮料/水果<input type="checkbox" name="type[]" value="4"></p>
+        <p>菜单图片：<input type="file" name="upfile[]" multiple="multiple" accept="image/png,image/jpeg,image/jpg" /></p>
+        <input type="submit" name="submit" value="上传" />
+    </form>
+</body>
+</html>

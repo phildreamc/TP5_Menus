@@ -1,0 +1,95 @@
+﻿{include file="index/header" title="菜单" /}
+<form id="main" v-cloak>
+	<div class="bar">
+        <a class="all-icon" href="{:url('index/index')}" v-bind:class="{ 'active': {$type} == 0}"></a>
+        <a class="zc-icon" href="{:url('index/index','type=1')}" v-bind:class="{ 'active': {$type} == 1}"></a>
+        <a class="cc-icon" href="{:url('index/index','type=2')}" v-bind:class="{ 'active': {$type} == 2}"></a>
+        <a class="tc-icon" href="{:url('index/index','type=3')}" v-bind:class="{ 'active': {$type} == 3}"></a>
+        <a class="sg-icon" href="{:url('index/index','type=4')}" v-bind:class="{ 'active': {$type} == 4}"></a>
+		<!-- 两个按钮用于切换不同的列表布局 -->
+        <a class="upload-icon" href="{:url('menu/up_load/index')}"></a>
+		<a class="list-icon" onclick="goList()" v-bind:class="{ 'active': layout == 'list'}" v-on:click="layout = 'list'"></a>
+		<a class="grid-icon" onclick="goIndex(0,false)" v-bind:class="{ 'active': layout == 'grid'}" v-on:click="layout = 'grid'"></a>
+	</div>
+
+	<!-- 我们设置了两套布局页面。使用哪套依赖于 "layout" 绑定 -->
+
+	<ul v-if="layout == 'grid'" class="grid" style="width:100%;">
+        <textarea id="imgurl" cols="20" rows="1" style="position:absolute;left:-500px;"></textarea>
+		<!-- 使用大图，没有文本 -->
+        <div style="text-align:center;">
+            <span onclick="picgo('left')">菜单左移《《《</span>
+            &nbsp;&nbsp;&nbsp;
+            <a href="javascript:false;"><span style="text-align:center;width:100%;margin:10px 0px 10px 0px;" onclick="copy()">发起点餐</span></a>
+            &nbsp;&nbsp;&nbsp;
+            <span onclick="picgo('right')">》》》菜单右移</span>
+        </div>
+        <div style="width:100%;position:absolute;margin-top:10px;" id="move">
+            <div id="show_pic" style="text-align:left;width:10000px;padding-left:10%;" class="pics">
+                <img v-for="b in articles[picReal].picsArray" v-bind:src="b" />
+            </div>
+        </div>
+	</ul>
+
+	<ul v-if="layout == 'list'" class="list">
+		<!-- 使用小图及标题 -->
+		<div v-for="a in articles">
+            <div class="weblink_menhu" style="background-position:0px 0px;">
+                <a v-bind:id="a.index" onclick="goIndex(this.id,false)" v-on:click="layout = 'grid'"><p>{{a.name}}</p></a>
+            </div>
+		</div>
+	</ul>
+</form>
+<script>
+var picIndex = 0;
+var picReal = 0;
+var controller = false;
+var count = 0;
+var arr = {:json_encode($store)};
+var picMax = {$store|count};
+var pos = 0;
+for(var i=0; i<arr.length; i++){
+    arr[i].picsArray = arr[i].pics.split("@");
+    arr[i].index = count;
+    count++;
+}
+function goList(){
+    controller = false;
+}
+<!-- function change(){ -->
+    <!-- document.getElementById("pic").src = arr[index].pics; -->
+<!-- } -->
+function goIndex(index,scroll){
+    picIndex = index*2;
+    controller = true;
+    picReal = index;
+    var h = "";
+    if(scroll){
+        for (var i=0; i<arr[picReal].picsArray.length; i++){
+            h += '<img id="pic" src="'+arr[picReal].picsArray[i]+'" />';
+        }
+        document.getElementById("show_pic").innerHTML = h;
+        pos = 0;
+        document.getElementById("move").style.left = pos + "px";
+    }
+}
+function copy(){
+    var mid = arr[picReal].id;
+    var geturl = "{:url('order/order')}";
+    var url = geturl.split(".");
+    var ihref = url[0] + '/menu_id/' + mid;
+    window.location.href = ihref;
+}
+function picgo(v){
+    if(v=="left"){
+        pos -= 600;
+    }
+    if(v=="right"){
+        pos += 600;
+    }
+    document.getElementById("move").style.left = pos + "px";
+}
+</script>
+<script src="__STATIC__/js/index.js"></script>
+<script src="__STATIC__/js/controller.js"></script>
+{include file="index/footer" /}

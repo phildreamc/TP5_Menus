@@ -1,0 +1,119 @@
+﻿{include file="order/header" title="点餐" /}
+<div class="left">
+    <div style="text-align:center;">
+        <span class="move" onclick="picgo('left')">菜单左移《《《</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="move" onclick="picgo('right')">》》》菜单右移</span>
+    </div>
+    <div style="position:relative;width:100%;overflow:hidden;min-height:800px;">
+    <div style="width:100%;position:absolute;margin-top:10px;" id="move">
+        <div id="show_pic" style="text-align:left;width:10000px;padding-left:10%;" class="pics">
+            {volist name="pics" id="pic"}
+            <img src="{$pic}" />
+            {/volist}
+        </div>
+    </div>
+    </div>
+</div>
+<div class="right">
+    <div class="notice">
+        {if condition="($data.off eq false)"}
+        <span style="color:blue">点餐中</span>
+        {if condition="($Think.cookie.mid eq $mid)"}
+        <form action="{:url('order/shut')}" method="post">
+            <input type="hidden" name="mid" value="{$data.mid}" />
+            <input type="submit" value="截单" />
+        </form>
+        {/if}
+        <br>
+        <div>
+            <form id="form1" onsubmit="return false" action="#" method="post">
+                称呼：<input type="text" id="name" name="name" value="{$Think.cookie.name}" /><br>
+                点餐：<input type="text" id="orders" name="orders" /><br>
+                价格：<input type="number" id="count" name="count" /><br>
+                <input type="hidden" name="mid" value="{$data.mid}" /><br>
+                <input type="button" onclick="order()" value="确认点餐" />
+            </form>
+        </div>
+        <script>
+        function refresh(){
+            var mid = '{$mid}';
+            var geturl = "{:url('order/olist')}";
+            var url = geturl.split(".");
+            var ihref = url[0] + '/mid/' + mid;
+            <!-- window.frames["olist"].location.href = ihref; -->
+            <!-- setInterval(function(){window.frames["olist"].location.href = ihref;console.log("re");}, 3000); -->
+            $.ajax({
+                type:"GET",
+                url:ihref,
+                success:function (res){
+                    document.getElementById("ir").innerHTML = res;
+                }
+            });
+        }
+        refresh();
+        setInterval(refresh, 3000);
+        </script>
+        {else/}
+        <div>抱歉，已截单</div>
+        <script>
+        function refresh(){
+            var mid = '{$mid}';
+            var geturl = "{:url('order/olist')}";
+            var url = geturl.split(".");
+            var ihref = url[0] + '/mid/' + mid;
+            <!-- window.frames["olist"].location.href = ihref; -->
+            <!-- setInterval(function(){window.frames["olist"].location.href = ihref;console.log("re");}, 3000); -->
+            $.ajax({
+                type:"GET",
+                url:ihref,
+                success:function (res){
+                    document.getElementById("ir").innerHTML = res;
+                }
+            });
+        }
+        refresh();
+        </script>
+        {/if}
+    </div>
+    <div class="orders" id="ir">
+        
+    </div>
+</div>
+<script>
+var pos = 0;
+function order(){
+    if($('#name').val() == ''||$('#orders').val() == ''||$('#count').val() == ''){
+        alert("请完善信息！");
+        return false;
+    }
+    var reg = /^[\u4e00-\u9fa5a-zA-Z0-9+(),（），]+$/;
+    if(!reg.test($('#name').val())||!reg.test($('#orders').val())){
+        alert("称呼或者点餐格式不正确！");
+        return false;
+    }
+    $.ajax({
+        type:"POST",
+        url:"{:url('order/add')}",
+        data:$('#form1').serialize(),
+        success:function (res){
+            if (res == 'success'){
+                alert("点餐成功！");
+            }else{
+                alert("未知错误！");
+            }
+        },
+        error:function (XMLHttpRequest, textStatus, errorThrown){
+            alert("未知错误！请刷新查看是否已截单！");
+        }
+    });
+}
+function picgo(v){
+    if(v=="left"){
+        pos -= 600;
+    }
+    if(v=="right"){
+        pos += 600;
+    }
+    document.getElementById("move").style.left = pos + "px";
+}
+</script>
+{include file="index/footer" /}
